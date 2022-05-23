@@ -1,0 +1,16 @@
+name: build-without-cache
+
+on: [push, pull_request]
+
+jobs:
+  build-without-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Build docker containers
+        run: docker-compose build app-without-cache
+      - name: Install dependencies via composer
+        run: docker-compose run --rm app-without-cache composer install --no-interaction --prefer-dist

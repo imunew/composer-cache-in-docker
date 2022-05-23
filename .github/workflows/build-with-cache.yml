@@ -1,0 +1,23 @@
+name: build-with-cache
+
+on: [push, pull_request]
+
+jobs:
+  build-with-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Cache .composer/cache
+        uses: actions/cache@v3
+        with:
+          path: .composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('laravel-app/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Build docker containers
+        run: docker-compose build app-with-cache
+      - name: Install dependencies via composer
+        run: docker-compose run --rm app-with-cache composer install --no-interaction --prefer-dist
